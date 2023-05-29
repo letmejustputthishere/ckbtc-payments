@@ -3,7 +3,9 @@ import Blob "mo:base/Blob";
 import Array "mo:base/Array";
 import Principal "mo:base/Principal";
 import Nat8 "mo:base/Nat8";
+
 module {
+
   /// Convert Principal to ICRC1.Subaccount
   // from https://github.com/research-ag/motoko-lib/blob/2772d029c1c5087c2f57b022c84882f2ac16b79d/src/TokenHandler.mo#L51
   public func toSubaccount(p : Principal) : Types.Subaccount {
@@ -29,10 +31,17 @@ module {
     Blob.fromArray(a);
   };
 
-  public func toAccount(principal : Principal, canisterId : Principal) : Types.Account {
+  public func toAccount({ caller : Principal; canister : Principal }) : Types.Account {
     {
-      owner = canisterId;
-      subaccount = ?toSubaccount(principal);
+      owner = canister;
+      subaccount = ?toSubaccount(caller);
+    };
+  };
+
+  public func createInvoice(to : Types.Account, amount : Nat) : Types.Invoice {
+    {
+      to;
+      amount;
     };
   };
 };

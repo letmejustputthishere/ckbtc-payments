@@ -3,8 +3,9 @@ import Time "mo:base/Time";
 import Int "mo:base/Int";
 import CkBtcLedger "canister:ckbtc_ledger";
 import Types "./types";
-import { toAccount } "./utils";
+import { toAccount; toSubaccount; createInvoice } "./utils";
 import Principal "mo:base/Principal";
+import Error "mo:base/Error";
 
 actor FortuneCookie {
   let cookies = [
@@ -60,11 +61,47 @@ actor FortuneCookie {
     "Your potential is limitless. Believe in yourself and aim high.",
   ];
 
-  public func getCookie() : async Result.Result<Text, Text> {
+  public shared ({ caller }) func getCookie() : async Result.Result<Text, Text> {
+
+    // check ckBTC balance of the callers dedicated account
+    let balance = await CkBtcLedger.icrc1_balance_of(
+      toAccount({ caller; canister = Principal.fromActor(FortuneCookie) })
+    );
+
+    if (balance < 100) {
+      return #err("Not enough funds available in the Account. Make sure you send at least 100 ckSats.");
+    };
+
+    try {
+      // if enough funds were sent, move them to the canisters default account
+      let transferResult = await CkBtcLedger.icrc1_transfer(
+        {
+          amount = balance;
+          from_subaccount = ?toSubaccount(caller);
+          created_at_time = null;
+          fee = ?10;
+          memo = null;
+          to = {
+            owner = Principal.fromActor(FortuneCookie);
+            subaccount = null;
+          };
+        }
+      );
+
+      switch (transferResult) {
+        case (#Err(transferError)) {
+          return #err("Couldn't transfer funds to default account:\n" # debug_show (transferError));
+        };
+        case (_) {};
+      };
+    } catch (error : Error) {
+      return #err("Reject message: " # Error.message(error));
+    };
+
     return #ok("🥠: " # cookies[Int.abs(Time.now() / 1000 % 50)]);
   };
 
-  public shared ({ caller }) func getInvoice() : async Types.Account {
-    toAccount(caller, Principal.fromActor(FortuneCookie));
+  public shared ({ caller }) func getInvoice() : async Types.Invoice {
+    createInvoice(toAccount({ caller; canister = Principal.fromActor(FortuneCookie) }), 100);
   };
 };

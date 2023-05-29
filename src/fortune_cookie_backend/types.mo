@@ -5,7 +5,7 @@ module {
     subaccount : ?Subaccount;
   };
   public type Invoice = {
-    account : Account;
+    to : Account;
     amount : Nat;
   };
 };
