@@ -1,7 +1,12 @@
 import Result "mo:base/Result";
 import Time "mo:base/Time";
 import Int "mo:base/Int";
-actor {
+import CkBtcLedger "canister:ckbtc_ledger";
+import Types "./types";
+import { toAccount } "./utils";
+import Principal "mo:base/Principal";
+
+actor FortuneCookie {
   let cookies = [
     "A journey of a thousand miles begins with a single step.",
     "Your greatest fortune is the friends you keep.",
@@ -57,5 +62,9 @@ actor {
 
   public func getCookie() : async Result.Result<Text, Text> {
     return #ok("🥠: " # cookies[Int.abs(Time.now() / 1000 % 50)]);
+  };
+
+  public shared ({ caller }) func getInvoice() : async Types.Account {
+    toAccount(caller, Principal.fromActor(FortuneCookie));
   };
 };

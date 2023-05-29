@@ -2,7 +2,10 @@
   "canisters": {
     "fortune_cookie_backend": {
       "main": "src/fortune_cookie_backend/main.mo",
-      "type": "motoko"
+      "type": "motoko",
+      "dependencies": [
+        "ckbtc_ledger"
+      ]
     },
     "ckbtc_ledger" : {
       "type" : "custom",
