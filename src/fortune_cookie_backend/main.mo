@@ -76,7 +76,7 @@ actor FortuneCookie {
       // if enough funds were sent, move them to the canisters default account
       let transferResult = await CkBtcLedger.icrc1_transfer(
         {
-          amount = balance;
+          amount = balance -10;
           from_subaccount = ?toSubaccount(caller);
           created_at_time = null;
           fee = ?10;
