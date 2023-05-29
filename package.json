@@ -9,13 +9,15 @@
     "Canister"
   ],
   "scripts": {
-    "build": "webpack",
-    "prebuild": "dfx generate",
-    "start": "webpack serve --mode development --env development",
-    "deploy:local": "dfx deploy --network=local",
-    "deploy:ic": "dfx deploy --network=ic",
-    "generate": "dfx generate fortune_cookie_backend"
-  },
+    "start": "npm run replica && npm run private-dids && npm run deploy",
+    "replica": "dfx stop && rm -rf .dfx && dfx start --clean --background && dfx canister create ckbtc_ledger && dfx canister create fortune_cookie_backend",
+    "deploy": "npm run deploy:ledger && npm run deploy:fortune_cookie_backend",
+    "public-dids": "perl -i -pe 's|icrc1\\.did|icrc1\\.public\\.did|g' dfx.json",
+    "private-dids": "perl -i -pe 's|icrc1\\.public\\.did|icrc1\\.did|g' dfx.json",
+    "deploy:ledger": "PRINCIPAL=$(dfx identity get-principal) && dfx deploy ckbtc_ledger --argument \"(variant {Init = record {minting_account = record { owner = principal \\\"$PRINCIPAL\\\" };transfer_fee = 0;token_symbol = \\\"ckBTC\\\";token_name = \\\"Token ckBTC\\\";metadata = vec {};initial_balances = vec {record { record {owner = principal \\\"$PRINCIPAL\\\"}; 100_000_000_000 } };archive_options = record {num_blocks_to_archive = 10_000;trigger_threshold = 20_000;cycles_for_archive_creation = opt 4_000_000_000_000;controller_id = principal \\\"$PRINCIPAL\\\";};}})\"  --mode=reinstall -y",
+    "deploy:fortune_cookie_backend": "npm run public-dids && dfx deploy fortune_cookie_backend",
+    "mint": "read -p \"Enter a principal you want to mint tokens to. By default 1000 ckBTC will be minted to your current dfx identity.\n\" recipient && if [ -z \"$recipient\" ]; then echo \"No recipient specified, skipping minting.\"; else dfx canister call ckbtc_ledger icrc1_transfer \"(record {to = record {owner = principal \\\"$recipient\\\"};amount=100_000_000_000},)\"; fi"
+},
   "dependencies": {
     "@dfinity/agent": "^0.15.6",
     "@dfinity/candid": "^0.15.6",

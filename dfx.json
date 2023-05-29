@@ -4,6 +4,17 @@
       "main": "src/fortune_cookie_backend/main.mo",
       "type": "motoko"
     },
+    "ckbtc_ledger" : {
+      "type" : "custom",
+      "candid" : "icrc1.public.did",
+      "wasm" : "icrc1.wasm",
+      "remote": {
+        "candid": "icrc1.public.did",
+        "id": {
+          "ic" : "mxzaz-hqaaa-aaaar-qaada-cai"
+        }
+      }
+    },
     "fortune_cookie_frontend": {
       "dependencies": [
         "fortune_cookie_backend"
