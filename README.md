@@ -1,3 +1,5 @@
+**Find the guide to this repo [here](https://dfinityorg.notion.site/ckBTC-example-Encode-Hackathon-0aaf6292e3404dabb49df5d1b5abc797?pvs=4).**
+
 # fortune_cookie
 
 Welcome to your new fortune_cookie project and to the internet computer development community. By default, creating a new project adds this README and some template files to your project directory. You can edit these template files to customize your project and to include your own code to speed up the development cycle.
